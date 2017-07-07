@@ -15,10 +15,7 @@ RUN echo "${NOMAD_SHA256}  nomad.zip" > nomad.sha256 \
     && unzip nomad.zip \
     && rm nomad.zip \
     && chmod +x nomad \
-    && mv nomad /usr/bin/nomad \
-    && mkdir -pm 0600 /etc/nomad.d \
-    && mkdir -pm 0600 /opt/nomad \
-    && mkdir -p /opt/nomad/data
+    && mv nomad /usr/bin/nomad
 
 ENTRYPOINT ["wrapdocker"]
 CMD []
