@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ "$1" == "" ]
+then
+  echo "Available commands are:"
+  echo "  init : init cluster"
+  echo "  stop : stop cluster"
+elif [ "$1" == "init" ]
+then
+  echo "Starting consul"
+  nohup consul agent -dev &>/dev/null &
+
+  echo "Starting Vault"
+  nohup vault server -dev &>/dev/null &
+
+  echo "Starting Nomad"
+  nohup nomad agent -dev &>/dev/null &
+elif [ "$1" == "stop" ]
+then
+  echo "Stoping Nomad"
+  pkill -TERM nomad
+
+  echo "Stoping Vault"
+  pkill -TERM vault
+
+  echo "Stoping consul"
+  pkill -TERM consul
+else
+  echo "Unsupported command!"
+fi
