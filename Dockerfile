@@ -1,13 +1,32 @@
-FROM jpetazzo/dind
+FROM docker:latest
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y unzip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+ENV GLIBC_VERSION=2.25-r0
+
+RUN apk update && apk upgrade && \
+    mkdir -p /etc/BUILDS/ && \
+    printf "Build of nimmis/alpine-glibc:3.5, date: %s\n"  `date -u +"%Y-%m-%dT%H:%M:%SZ"` > /etc/BUILDS/alpine-glibc && \
+    apk add curl && \
+    curl -L -o glibc-${GLIBC_VERSION}.apk \
+      "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk" && \
+    curl -L -o glibc-bin-${GLIBC_VERSION}.apk \
+      "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-bin-${GLIBC_VERSION}.apk" && \
+    apk add --allow-untrusted glibc-${GLIBC_VERSION}.apk glibc-bin-${GLIBC_VERSION}.apk && \
+    apk del curl && \
+    rm -fr glibc-${GLIBC_VERSION}.apk glibc-bin-${GLIBC_VERSION}.apk /var/cache/apk/*
+
+RUN apk upgrade --update --no-cache && \
+    apk add --update --no-cache curl util-linux
 
 ENV NOMAD_VERSION 0.5.6
 ENV NOMAD_SHA256 3f5210f0bcddf04e2cc04b14a866df1614b71028863fe17bcdc8585488f8cb0c
+
+ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip /tmp/nomad.zip
+RUN echo "${NOMAD_SHA256}  /tmp/nomad.zip" > /tmp/nomad.sha256 \
+  && sha256sum -c /tmp/nomad.sha256 \
+  && cd /bin \
+  && unzip /tmp/nomad.zip \
+  && chmod +x /bin/nomad \
+  && rm /tmp/nomad.zip
 
 ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip nomad.zip
 RUN echo "${NOMAD_SHA256}  nomad.zip" > nomad.sha256 \
@@ -39,8 +58,9 @@ RUN echo "${VAULT_SHA256}  vault.zip" > vault.sha256 \
     && chmod +x vault \
     && mv vault /usr/bin/vault
 
-ADD ./citadel /usr/bin/citadel
-RUN chmod +x /usr/bin/citadel
+ADD citadel citadel
+RUN chmod +x citadel \
+    && mv citadel /usr/bin/citadel
 
-ENTRYPOINT ["wrapdocker"]
-CMD []
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["sh"]
