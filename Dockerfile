@@ -5,7 +5,7 @@ ENV GLIBC_VERSION=2.25-r0
 RUN apk update && apk upgrade && \
     mkdir -p /etc/BUILDS/ && \
     printf "Build of nimmis/alpine-glibc:3.5, date: %s\n"  `date -u +"%Y-%m-%dT%H:%M:%SZ"` > /etc/BUILDS/alpine-glibc && \
-    apk add curl tar && \
+    apk add curl && \
     curl -L -o glibc-${GLIBC_VERSION}.apk \
       "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk" && \
     curl -L -o glibc-bin-${GLIBC_VERSION}.apk \
