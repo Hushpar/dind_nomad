@@ -5,7 +5,7 @@ ENV GLIBC_VERSION=2.25-r0
 RUN apk update && apk upgrade && \
     mkdir -p /etc/BUILDS/ && \
     printf "Build of nimmis/alpine-glibc:3.5, date: %s\n"  `date -u +"%Y-%m-%dT%H:%M:%SZ"` > /etc/BUILDS/alpine-glibc && \
-    apk add curl && \
+    apk add curl tar && \
     curl -L -o glibc-${GLIBC_VERSION}.apk \
       "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk" && \
     curl -L -o glibc-bin-${GLIBC_VERSION}.apk \
@@ -17,16 +17,8 @@ RUN apk update && apk upgrade && \
 RUN apk upgrade --update --no-cache && \
     apk add --update --no-cache curl util-linux
 
-ENV NOMAD_VERSION 0.5.6
-ENV NOMAD_SHA256 3f5210f0bcddf04e2cc04b14a866df1614b71028863fe17bcdc8585488f8cb0c
-
-ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip /tmp/nomad.zip
-RUN echo "${NOMAD_SHA256}  /tmp/nomad.zip" > /tmp/nomad.sha256 \
-  && sha256sum -c /tmp/nomad.sha256 \
-  && cd /bin \
-  && unzip /tmp/nomad.zip \
-  && chmod +x /bin/nomad \
-  && rm /tmp/nomad.zip
+ENV NOMAD_VERSION 0.6.0
+ENV NOMAD_SHA256 fcf108046164cfeda84eab1c3047e36ad59d239b66e6b2f013e6c93064bc6313
 
 ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip nomad.zip
 RUN echo "${NOMAD_SHA256}  nomad.zip" > nomad.sha256 \
@@ -36,8 +28,8 @@ RUN echo "${NOMAD_SHA256}  nomad.zip" > nomad.sha256 \
     && chmod +x nomad \
     && mv nomad /usr/bin/nomad
 
-ENV CONSUL_VERSION 0.8.5
-ENV CONSUL_SHA256 35dc317c80862c306ea5b1d9bc93709483287f992fd0797d214d1cc1848e7b62
+ENV CONSUL_VERSION 0.9.2
+ENV CONSUL_SHA256 0a2921fc7ca7e4702ef659996476310879e50aeeecb5a205adfdbe7bd8524013
 
 ADD https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip consul.zip
 RUN echo "${CONSUL_SHA256}  consul.zip" > consul.sha256 \
@@ -47,8 +39,8 @@ RUN echo "${CONSUL_SHA256}  consul.zip" > consul.sha256 \
     && chmod +x consul \
     && mv consul /usr/bin/consul
 
-ENV VAULT_VERSION 0.7.3
-ENV VAULT_SHA256 2822164d5dd347debae8b3370f73f9564a037fc18e9adcabca5907201e5aab45
+ENV VAULT_VERSION 0.8.1
+ENV VAULT_SHA256 3c4d70ba71619a43229e65c67830e30e050eab7a81ac6b28325ff707e5914188
 
 ADD https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip vault.zip
 RUN echo "${VAULT_SHA256}  vault.zip" > vault.sha256 \
@@ -61,6 +53,11 @@ RUN echo "${VAULT_SHA256}  vault.zip" > vault.sha256 \
 ADD citadel citadel
 RUN chmod +x citadel \
     && mv citadel /usr/bin/citadel
+
+ENV SNOWBOARD_VERSION 0.6.7
+ADD https://github.com/bukalapak/snowboard/releases/download/v${SNOWBOARD_VERSION}/snowboard-v${SNOWBOARD_VERSION}.linux-amd64.tar.gz snowboard
+RUN chmod +x snowboard/snowboard \
+    && mv snowboard/snowboard /usr/bin/snowboard
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["sh"]
