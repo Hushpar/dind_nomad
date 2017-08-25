@@ -5,7 +5,7 @@ ENV GLIBC_VERSION=2.25-r0
 RUN apk update && apk upgrade && \
     mkdir -p /etc/BUILDS/ && \
     printf "Build of nimmis/alpine-glibc:3.5, date: %s\n"  `date -u +"%Y-%m-%dT%H:%M:%SZ"` > /etc/BUILDS/alpine-glibc && \
-    apk add curl && \
+    apk add tar curl libstdc++ && \
     curl -L -o glibc-${GLIBC_VERSION}.apk \
       "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk" && \
     curl -L -o glibc-bin-${GLIBC_VERSION}.apk \
@@ -55,9 +55,10 @@ RUN chmod +x citadel \
     && mv citadel /usr/bin/citadel
 
 ENV SNOWBOARD_VERSION 0.6.7
-ADD https://github.com/bukalapak/snowboard/releases/download/v${SNOWBOARD_VERSION}/snowboard-v${SNOWBOARD_VERSION}.linux-amd64.tar.gz snowboard
-RUN chmod +x snowboard/snowboard \
-    && mv snowboard/snowboard /usr/bin/snowboard
+RUN curl -o snowboard.tar.gz -SL https://github.com/bukalapak/snowboard/releases/download/v${SNOWBOARD_VERSION}/snowboard-v${SNOWBOARD_VERSION}.linux-amd64.tar.gz \
+    && tar -xzf snowboard.tar.gz \ 
+    && chmod +x snowboard \
+    && mv snowboard /usr/bin/snowboard
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["sh"]
