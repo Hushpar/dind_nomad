@@ -17,8 +17,8 @@ RUN apk update && apk upgrade && \
 RUN apk upgrade --update --no-cache && \
     apk add --update --no-cache curl util-linux
 
-ENV NOMAD_VERSION 0.6.0
-ENV NOMAD_SHA256 fcf108046164cfeda84eab1c3047e36ad59d239b66e6b2f013e6c93064bc6313
+ENV NOMAD_VERSION 0.7.0
+ENV NOMAD_SHA256 b3b78dccbdbd54ddc7a5ffdad29bce2d745cac93ea9e45f94e078f57b756f511
 
 ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip nomad.zip
 RUN echo "${NOMAD_SHA256}  nomad.zip" > nomad.sha256 \
@@ -28,8 +28,8 @@ RUN echo "${NOMAD_SHA256}  nomad.zip" > nomad.sha256 \
     && chmod +x nomad \
     && mv nomad /usr/bin/nomad
 
-ENV CONSUL_VERSION 0.9.2
-ENV CONSUL_SHA256 0a2921fc7ca7e4702ef659996476310879e50aeeecb5a205adfdbe7bd8524013
+ENV CONSUL_VERSION 1.0.0
+ENV CONSUL_SHA256 585782e1fb25a2096e1776e2da206866b1d9e1f10b71317e682e03125f22f479
 
 ADD https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip consul.zip
 RUN echo "${CONSUL_SHA256}  consul.zip" > consul.sha256 \
@@ -39,8 +39,8 @@ RUN echo "${CONSUL_SHA256}  consul.zip" > consul.sha256 \
     && chmod +x consul \
     && mv consul /usr/bin/consul
 
-ENV VAULT_VERSION 0.8.1
-ENV VAULT_SHA256 3c4d70ba71619a43229e65c67830e30e050eab7a81ac6b28325ff707e5914188
+ENV VAULT_VERSION 0.9.0
+ENV VAULT_SHA256 801ce0ceaab4d2e59dbb35ea5191cfe8e6f36bb91500e86bec2d154172de59a4
 
 ADD https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip vault.zip
 RUN echo "${VAULT_SHA256}  vault.zip" > vault.sha256 \
@@ -53,12 +53,6 @@ RUN echo "${VAULT_SHA256}  vault.zip" > vault.sha256 \
 ADD citadel citadel
 RUN chmod +x citadel \
     && mv citadel /usr/bin/citadel
-
-ENV SNOWBOARD_VERSION 0.6.7
-RUN curl -o snowboard.tar.gz -SL https://github.com/bukalapak/snowboard/releases/download/v${SNOWBOARD_VERSION}/snowboard-v${SNOWBOARD_VERSION}.linux-amd64.tar.gz \
-    && tar -xzf snowboard.tar.gz \ 
-    && chmod +x snowboard \
-    && mv snowboard /usr/bin/snowboard
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["sh"]
